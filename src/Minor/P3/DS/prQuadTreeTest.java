@@ -39,7 +39,7 @@ public class prQuadTreeTest {
 		
 		//Add a new point which will fall in the SW quadrant, check that root is internal
 		Point testPoint_3 = new Point(-5,-5);
-		assertTrue(testTree.insert(testPoint_2));
+		assertTrue(testTree.insert(testPoint_3));
 		assertEquals(testTree.root.getClass(), prQuadTree.prQuadInternal.class);
 		currNodeInternal = (prQuadTree.prQuadInternal) testTree.root;
 		currNodeLeaf = (prQuadTree.prQuadLeaf)currNodeInternal.NE;
@@ -51,7 +51,7 @@ public class prQuadTreeTest {
 		
 		//Add a new point which will fall in the SE quadrant, check that root is internal
 		Point testPoint_4 = new Point(5,-5);
-		assertTrue(testTree.insert(testPoint_2));
+		assertTrue(testTree.insert(testPoint_4));
 		assertEquals(testTree.root.getClass(), prQuadTree.prQuadInternal.class);
 		currNodeInternal = (prQuadTree.prQuadInternal) testTree.root;
 		currNodeLeaf = (prQuadTree.prQuadLeaf)currNodeInternal.NE;
@@ -64,6 +64,26 @@ public class prQuadTreeTest {
 		assertEquals(currNodeLeaf.Elements.get(0), testPoint_4);
 		
 		//Test that adding a point resulting in two branches works correctly
+		testTree.root = null;
+		Point testPoint_B1 = new Point(10,10);
+		Point testPoint_B2 = new Point(30,30);
+		assertTrue(testTree.insert(testPoint_B1));
+		assertTrue(testTree.insert(testPoint_B2));
+		
+		assertEquals(testTree.root.getClass(), prQuadTree.prQuadInternal.class);
+		currNodeInternal = (prQuadTree.prQuadInternal) testTree.root;
+		assertEquals(currNodeInternal.getClass(), prQuadTree.prQuadInternal.class);
+		currNodeInternal = (prQuadTree.prQuadInternal) currNodeInternal.NE;
+		assertEquals(currNodeInternal.getClass(), prQuadTree.prQuadInternal.class);
+		currNodeInternal = (prQuadTree.prQuadInternal) currNodeInternal.SW;
+		
+		assertEquals(currNodeInternal.SW.getClass(), prQuadTree.prQuadLeaf.class);
+		currNodeLeaf = (prQuadTree.prQuadLeaf)currNodeInternal.SW;
+		assertEquals(testPoint_B1, currNodeLeaf.Elements.get(0));
+		
+		assertEquals(currNodeInternal.NE.getClass(), prQuadTree.prQuadLeaf.class);
+		currNodeLeaf = (prQuadTree.prQuadLeaf)currNodeInternal.NE;
+		assertEquals(testPoint_B2, currNodeLeaf.Elements.get(0));
 		
 		//Test that addition at a boundary is inserted correctly
 		//clear the tree, insert at (0,0), (0,75) (75,0) (0,-75) (-75,0)
@@ -85,7 +105,7 @@ public class prQuadTreeTest {
 		//Test NW addition
 		assertEquals(currNodeInternal.NW.getClass(), prQuadTree.prQuadLeaf.class);
 		currNodeLeaf = (prQuadTree.prQuadLeaf)currNodeInternal.NW;
-		assertEquals(currNodeLeaf.Elements.get(0), testPoint_NW);
+		assertEquals(testPoint_NW, currNodeLeaf.Elements.get(0));
 		
 		//Test SW Addition
 		assertEquals(currNodeInternal.SW.getClass(), prQuadTree.prQuadLeaf.class);
