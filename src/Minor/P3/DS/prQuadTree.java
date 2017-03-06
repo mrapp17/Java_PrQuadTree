@@ -59,6 +59,33 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 	   return insertSuccessStat;
 	}
    
+   // Pre:  elem != null
+   // Returns reference to an element x within the tree such that 
+   // elem.equals(x)is true, provided such a matching element occurs within
+   // the tree; returns null otherwise.
+   public T find(T elem) {
+	   return findHelper(root, elem);
+	}
+
+   // Pre:  elem != null
+   // Post: If elem lies in the tree's region, and a matching element occurs
+   //       in the tree, then that element has been removed.
+   // Returns true iff a matching element has been removed from the tree.   
+   public boolean delete(T elem) {
+		
+		return false;
+	}
+
+   // Pre:  xLo < xHi and yLo < yHi
+   // Returns a collection of (references to) all elements x such that x is 
+   //in the tree and x lies at coordinates within the defined rectangular 
+   // region, including the boundary of the region.
+   public ArrayList<T> find(long xLo, long xHi, long yLo, long yHi) {
+		
+		return null;
+	}
+	
+	// Additonal methods should be added below:
    @SuppressWarnings({ "rawtypes", "unchecked" })
    private prQuadNode insertHelper(prQuadNode currNode, prQuadLeaf newNode,long xLo, long xHi, long yLo, long yHi){
 	   //If the current node is null then create new leaf node and return that
@@ -68,7 +95,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 	   }
 	   else if (currNode.getClass() == prQuadTree.prQuadLeaf.class){
 		   prQuadTree.prQuadLeaf temp = (prQuadTree.prQuadLeaf) currNode;
-		   if(temp.Elements.get(0) == newNode.Elements.get(0))
+		   if(temp.Elements.get(0).equals(newNode.Elements.get(0)))
 			   return temp;
 		   prQuadInternal retNode = new prQuadInternal();
 		   insertHelper(retNode,temp, xLo, xHi, yLo, yHi);
@@ -109,38 +136,65 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 		   //ERROR
 		   return null;
 	   }
-	   //if current node is a leaf store its value in a temp value
-	   //Convert current node to internal
-	   //Insert the temp value, then insert elem using helper
    }
 
-   // Pre:  elem != null
-   // Returns reference to an element x within the tree such that 
-   // elem.equals(x)is true, provided such a matching element occurs within
-   // the tree; returns null otherwise.
-   public T find(T Elem) {
-		
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private T findHelper(prQuadNode currNode, T elem){
+		if(currNode == null)
+			return null;
+		else if(currNode.getClass() == prQuadTree.prQuadLeaf.class){
+			prQuadTree.prQuadLeaf currNodeLeaf = (prQuadTree.prQuadLeaf) currNode;
+			if(currNodeLeaf.Elements.get(0).equals(elem))
+				return (T) currNodeLeaf.Elements.get(0);
+		}
+		else if(currNode.getClass() == prQuadTree.prQuadInternal.class){
+			//Determine which direction within this node it WOULD go, then call the helper method in that direction
+		}
 		return null;
 	}
-
-   // Pre:  elem != null
-   // Post: If elem lies in the tree's region, and a matching element occurs
-   //       in the tree, then that element has been removed.
-   // Returns true iff a matching element has been removed from the tree.   
-   public boolean delete(T Elem) {
-		
-		return false;
-	}
-
-   // Pre:  xLo < xHi and yLo < yHi
-   // Returns a collection of (references to) all elements x such that x is 
-   //in the tree and x lies at coordinates within the defined rectangular 
-   // region, including the boundary of the region.
-   public ArrayList<T> find(long xLo, long xHi, long yLo, long yHi) {
-		
-		return null;
-	}
-	
-	// Additonal methods should be added below:
 	
 }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

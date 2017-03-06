@@ -63,6 +63,19 @@ public class prQuadTreeTest {
 		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.SE;
 		assertEquals(currNodeLeaf.Elements.get(0), testPoint_4);
 		
+		//Test that a repeat point can not be added
+		Point testPoint_5 = new Point(5,-5);
+		assertFalse(testTree.insert(testPoint_5));
+		assertEquals(testTree.root.getClass(), prQuadTree.prQuadInternal.class);
+		currNodeInternal = (prQuadTree.prQuadInternal) testTree.root;
+		currNodeLeaf = (prQuadTree.prQuadLeaf)currNodeInternal.NE;
+		assertEquals(currNodeLeaf.Elements.get(0), testPoint_1);
+		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.NW;
+		assertEquals(currNodeLeaf.Elements.get(0), testPoint_2);
+		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.SW;
+		assertEquals(currNodeLeaf.Elements.get(0), testPoint_3);
+		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.SE;
+		assertEquals(currNodeLeaf.Elements.get(0), testPoint_4);
 		//Test that adding a point resulting in two branches works correctly
 		testTree.root = null;
 		Point testPoint_B1 = new Point(10,10);
@@ -134,7 +147,37 @@ public class prQuadTreeTest {
 	
 	@Test
 	public void testFindT() {
-		fail("Not yet implemented");
+		prQuadTree<Point> testTree = new prQuadTree<Point>(-100,100,-100,100);
+		//Elements marked 1 will be found, elements marked 2 will no be found in the tree
+		Point testPoint_NE_1 = new Point(25,25);
+		Point testPoint_NE_2 = new Point(75,75);
+		Point testPoint_NW_1 = new Point(-25,25);
+		Point testPoint_NW_2 = new Point(-75,75);
+		Point testPoint_SE_1 = new Point(-25,-25);
+		Point testPoint_SE_2 = new Point(-75,-75);
+		Point testPoint_SW_1 = new Point(25,-75);
+		Point testPoint_SW_2 = new Point(25,-75);
+		//Test find on empty tree
+		assertEquals(null, testTree.find(testPoint_NE_1));
+		//Test find on tree with one leaf node at root
+		testTree.insert(testPoint_NE_1);
+		assertEquals(testPoint_NE_1, testTree.find(testPoint_NE_1));
+		//Test find on tree with 4 filled leaf nodes
+		testTree.insert(testPoint_NW_1);
+		testTree.insert(testPoint_SE_1);
+		testTree.insert(testPoint_SW_1);
+		assertEquals(testPoint_NE_1, testTree.find(testPoint_NW_1));
+		assertEquals(testPoint_SE_1, testTree.find(testPoint_SE_1));
+		assertEquals(testPoint_SW_1, testTree.find(testPoint_SW_1));
+		//Test that elements not in tree are not found
+		assertEquals(null, testTree.find(testPoint_NE_2));
+		assertEquals(null, testTree.find(testPoint_NW_2));
+		assertEquals(null, testTree.find(testPoint_SE_2));
+		assertEquals(null, testTree.find(testPoint_SW_2));
+		//Test that find works correctly with a stalky branch
+		Point testPoint_NE_3 = new Point(20,20);
+		assertTrue(testTree.insert(testPoint_NE_3));
+		assertEquals(testPoint_NE_3, testTree.find(testPoint_NE_3));
 	}
 
 	@Test
