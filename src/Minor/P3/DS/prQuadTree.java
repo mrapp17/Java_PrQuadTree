@@ -38,6 +38,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    long xMin, xMax, yMin, yMax;
    
    private boolean insertSuccessStat;
+   private ArrayList<T> foundList;
     
    // Initialize quadtree to empty state.
    public prQuadTree(long xMin, long xMax, long yMin, long yMax) {
@@ -54,6 +55,8 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    // Return true iff elem is inserted into the tree. 
    public boolean insert(T elem) {
 	   insertSuccessStat = false;
+	   if(!elem.inBox(xMin, xMax, yMin, yMax))
+		   return insertSuccessStat;
 	   prQuadLeaf newNode = new prQuadLeaf(elem);
 	   root = insertHelper(root, newNode, xMin, xMax, yMin, yMax);
 	   return insertSuccessStat;
@@ -64,7 +67,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    // elem.equals(x)is true, provided such a matching element occurs within
    // the tree; returns null otherwise.
    public T find(T elem) {
-	   return findHelper(root, elem);
+	   return findHelper(root, elem, xMin, xMax, yMin, yMax);
 	}
 
    // Pre:  elem != null
@@ -72,8 +75,10 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    //       in the tree, then that element has been removed.
    // Returns true iff a matching element has been removed from the tree.   
    public boolean delete(T elem) {
-		
-		return false;
+		if(elem == null)
+			return false;
+		else
+			return true;
 	}
 
    // Pre:  xLo < xHi and yLo < yHi
@@ -81,7 +86,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    //in the tree and x lies at coordinates within the defined rectangular 
    // region, including the boundary of the region.
    public ArrayList<T> find(long xLo, long xHi, long yLo, long yHi) {
-		
+		foundList.clear();
 		return null;
 	}
 	
@@ -140,7 +145,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private T findHelper(prQuadNode currNode, T elem){
+	private T findHelper(prQuadNode currNode, T elem, long xLo, long xHi, long yLo, long yHi){
 		if(currNode == null)
 			return null;
 		else if(currNode.getClass() == prQuadTree.prQuadLeaf.class){
@@ -149,11 +154,31 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 				return (T) currNodeLeaf.Elements.get(0);
 		}
 		else if(currNode.getClass() == prQuadTree.prQuadInternal.class){
+			long xMid = (long) (xHi + xLo) /2;
+			long yMid = (long) (yHi + yLo) /2;
+			
+			prQuadInternal temp = (prQuadInternal) currNode;
 			//Determine which direction within this node it WOULD go, then call the helper method in that direction
+			Direction elemDirection = elem.inQuadrant(xLo, xHi, yLo, yHi);
+			if(elemDirection == Direction.NE){
+				return findHelper(temp.NE, elem, xMid, xHi, yMid, yHi);
+			}
+			else if(elemDirection == Direction.NW){
+				return findHelper(temp.NW, elem, xLo, xMid, yMid, yHi);
+			}
+			else if(elemDirection == Direction.SW){
+				return findHelper(temp.SW, elem, xLo, xMid, yLo, yMid);
+			}
+			else if(elemDirection == Direction.SE){
+				return findHelper(temp.SE, elem, xMid, xHi, yLo, yMid);
+			}
+			else{
+				//ERROR
+				return null;
+			}
 		}
 		return null;
-	}
-	
+	}	
 }
 	
 	

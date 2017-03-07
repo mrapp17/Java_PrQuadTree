@@ -76,6 +76,7 @@ public class prQuadTreeTest {
 		assertEquals(currNodeLeaf.Elements.get(0), testPoint_3);
 		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.SE;
 		assertEquals(currNodeLeaf.Elements.get(0), testPoint_4);
+		
 		//Test that adding a point resulting in two branches works correctly
 		testTree.root = null;
 		Point testPoint_B1 = new Point(10,10);
@@ -156,7 +157,7 @@ public class prQuadTreeTest {
 		Point testPoint_SE_1 = new Point(-25,-25);
 		Point testPoint_SE_2 = new Point(-75,-75);
 		Point testPoint_SW_1 = new Point(25,-75);
-		Point testPoint_SW_2 = new Point(25,-75);
+		Point testPoint_SW_2 = new Point(75,-75);
 		//Test find on empty tree
 		assertEquals(null, testTree.find(testPoint_NE_1));
 		//Test find on tree with one leaf node at root
@@ -166,7 +167,7 @@ public class prQuadTreeTest {
 		testTree.insert(testPoint_NW_1);
 		testTree.insert(testPoint_SE_1);
 		testTree.insert(testPoint_SW_1);
-		assertEquals(testPoint_NE_1, testTree.find(testPoint_NW_1));
+		assertEquals(testPoint_NW_1, testTree.find(testPoint_NW_1));
 		assertEquals(testPoint_SE_1, testTree.find(testPoint_SE_1));
 		assertEquals(testPoint_SW_1, testTree.find(testPoint_SW_1));
 		//Test that elements not in tree are not found
@@ -175,18 +176,86 @@ public class prQuadTreeTest {
 		assertEquals(null, testTree.find(testPoint_SE_2));
 		assertEquals(null, testTree.find(testPoint_SW_2));
 		//Test that find works correctly with a stalky branch
-		Point testPoint_NE_3 = new Point(20,20);
+		Point testPoint_NE_3 = new Point(24,24);
 		assertTrue(testTree.insert(testPoint_NE_3));
 		assertEquals(testPoint_NE_3, testTree.find(testPoint_NE_3));
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Test
 	public void testDelete() {
-		fail("Not yet implemented");
+		//Test that delete will not succeed on an empty tree
+		prQuadTree<Point> testTree = new prQuadTree<Point>(-100,100,-100,100);
+		Point testPoint_1 = new Point(25,25);
+		Point testPoint_2 = new Point(-25,25);
+		assertFalse(testTree.delete(null));
+		assertFalse(testTree.delete(testPoint_1));
+		
+		//Test delete on single element tree, root node is a leaf
+		testTree.insert(testPoint_1);
+		assertFalse(testTree.delete(testPoint_2));
+		assertEquals(testPoint_1, testTree.find(testPoint_1));
+		assertTrue(testTree.delete(testPoint_1));
+		assertEquals(null, testTree.find(testPoint_1));
+		
+		//Test that after a remove the removed element can be reinserted
+		testTree.insert(testPoint_1);
+		assertTrue(testTree.delete(testPoint_1));
+		assertFalse(testTree.delete(testPoint_1));
+		assertEquals(null, testTree.find(testPoint_1));
+		testTree.insert(testPoint_1);
+		assertEquals(testPoint_1, testTree.find(testPoint_1));
+		
+		//Test delete on a tree with 4 elements, check tree format after each remove
+		Point testPoint_3 = new Point(25,25);
+		Point testPoint_4 = new Point(-25,25);
+		Point testPoint_5 = new Point(-25,-25);
+		Point testPoint_6 = new Point(25,-25);
+		testTree.insert(testPoint_3);
+		testTree.insert(testPoint_4);
+		testTree.insert(testPoint_5);
+		testTree.insert(testPoint_6);
+		prQuadTree.prQuadInternal currNodeInternal = (prQuadTree.prQuadInternal) testTree.root;
+		//Check NE Quadrant
+		assertEquals(prQuadTree.prQuadLeaf.class, currNodeInternal.NE.getClass());
+		prQuadTree.prQuadLeaf currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.NE;
+		assertEquals(testPoint_3, currNodeLeaf.Elements.get(0));
+		assertTrue(testTree.delete(testPoint_3));
+		assertEquals(null,currNodeInternal.NW);
+		//Check NW Quadrant
+		assertEquals(prQuadTree.prQuadLeaf.class, currNodeInternal.NW.getClass());
+		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.NW;
+		assertEquals(testPoint_4, currNodeLeaf.Elements.get(0));
+		assertTrue(testTree.delete(testPoint_4));
+		assertEquals(null,currNodeInternal.NE);
+		//Check SW Quadrant (root should be a leaf after)
+		assertEquals(prQuadTree.prQuadLeaf.class, currNodeInternal.SW.getClass());
+		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.SW;
+		assertEquals(testPoint_5, currNodeLeaf.Elements.get(0));
+		assertTrue(testTree.delete(testPoint_5));
+		assertEquals(prQuadTree.prQuadLeaf.class, testTree.root.getClass());
+		//Check SE Quadrant (root should be null after)
+		currNodeLeaf = (prQuadTree.prQuadLeaf)testTree.root;
+		assertEquals(testPoint_6,currNodeLeaf.Elements.get(0));
+		assertTrue(testTree.delete(testPoint_6));
+		assertEquals(null,testTree.root);
+		
+		//Test delete on a stalky tree, ensure compression happens correctly
+		testTree.root = null;
+		Point testPoint_7 = new Point(25,25);
+		Point testPoint_8 = new Point(75,75);
+		testTree.insert(testPoint_7);
+		testTree.insert(testPoint_8);
+		assertEquals(prQuadTree.prQuadInternal.class, testTree.root.getClass());
+		assertTrue(testTree.delete(testPoint_7));
+		assertEquals(prQuadTree.prQuadLeaf.class, testTree.root.getClass());
+		assertEquals(null, testTree.find(testPoint_7));
+		assertTrue(testTree.delete(testPoint_8));
+		assertEquals(null, testTree.root);		
 	}
 
 	@Test
-	public void testFindLongLongLongLong() {
+	public void testFindList() {
 		fail("Not yet implemented");
 	}
 
