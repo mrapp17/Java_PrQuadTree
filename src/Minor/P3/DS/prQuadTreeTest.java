@@ -2,6 +2,8 @@ package Minor.P3.DS;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.Test;
 
 public class prQuadTreeTest {
@@ -221,13 +223,13 @@ public class prQuadTreeTest {
 		prQuadTree.prQuadLeaf currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.NE;
 		assertEquals(testPoint_3, currNodeLeaf.Elements.get(0));
 		assertTrue(testTree.delete(testPoint_3));
-		assertEquals(null,currNodeInternal.NW);
+		assertEquals(null,currNodeInternal.NE);
 		//Check NW Quadrant
 		assertEquals(prQuadTree.prQuadLeaf.class, currNodeInternal.NW.getClass());
 		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.NW;
 		assertEquals(testPoint_4, currNodeLeaf.Elements.get(0));
 		assertTrue(testTree.delete(testPoint_4));
-		assertEquals(null,currNodeInternal.NE);
+		assertEquals(null,currNodeInternal.NW);
 		//Check SW Quadrant (root should be a leaf after)
 		assertEquals(prQuadTree.prQuadLeaf.class, currNodeInternal.SW.getClass());
 		currNodeLeaf = (prQuadTree.prQuadLeaf) currNodeInternal.SW;
@@ -256,7 +258,81 @@ public class prQuadTreeTest {
 
 	@Test
 	public void testFindList() {
-		fail("Not yet implemented");
+		ArrayList<Point> testArrayList = new ArrayList<Point>();
+		prQuadTree<Point> testTree = new prQuadTree<Point>(-100,100,-100,100);
+		
+		//Test on empty tree
+		testArrayList = testTree.find(-100, 100, -100, 100);
+		assertTrue(testArrayList.isEmpty());
+		
+		//Test on root is leaf
+		Point testPoint_NE1 = new Point(25,25);
+		testTree.insert(testPoint_NE1);
+		testArrayList = testTree.find(-100, 100, -100, 100);
+		assertTrue(testArrayList.contains(testPoint_NE1));
+		testArrayList = testTree.find(-100,0,-100,100);
+		assertTrue(testArrayList.isEmpty());
+		
+		//Test basic operation with root being internal
+		Point testPoint_NW1 = new Point(-25,25);
+		Point testPoint_SW1 = new Point(-25,-25);
+		Point testPoint_SE1 = new Point(25,-25);
+		testTree.insert(testPoint_NW1);
+		testTree.insert(testPoint_SW1);
+		testTree.insert(testPoint_SE1);
+		
+		//Test on entire area
+		testArrayList = testTree.find(-100, 100, -100, 100);
+		assertTrue(testArrayList.contains(testPoint_NE1));
+		assertTrue(testArrayList.contains(testPoint_NW1));
+		assertTrue(testArrayList.contains(testPoint_SW1));
+		assertTrue(testArrayList.contains(testPoint_SE1));
+		
+		//test on area with all four points on border
+		testArrayList = testTree.find(-25, 25, -25, 25);
+		assertTrue(testArrayList.contains(testPoint_NE1));
+		assertTrue(testArrayList.contains(testPoint_NW1));
+		assertTrue(testArrayList.contains(testPoint_SW1));
+		assertTrue(testArrayList.contains(testPoint_SE1));
+		
+		//Test on area with zero points
+		testArrayList = testTree.find(-10, 10, -10, 10);
+		assertFalse(testArrayList.contains(testPoint_NE1));
+		assertFalse(testArrayList.contains(testPoint_NW1));
+		assertFalse(testArrayList.contains(testPoint_SW1));
+		assertFalse(testArrayList.contains(testPoint_SE1));
+		
+		//Test each Quadrant
+		//NE
+		testArrayList = testTree.find(0, 100, 0, 100);
+		assertEquals(1,testArrayList.size());
+		assertTrue(testArrayList.contains(testPoint_NE1));
+		assertFalse(testArrayList.contains(testPoint_NW1));
+		assertFalse(testArrayList.contains(testPoint_SW1));
+		assertFalse(testArrayList.contains(testPoint_SE1));
+		
+		//NW
+		testArrayList = testTree.find(-100, 0, 0, 100);
+		assertEquals(1,testArrayList.size());
+		assertFalse(testArrayList.contains(testPoint_NE1));
+		assertTrue(testArrayList.contains(testPoint_NW1));
+		assertFalse(testArrayList.contains(testPoint_SW1));
+		assertFalse(testArrayList.contains(testPoint_SE1));
+		
+		//SW
+		testArrayList = testTree.find(-100, 0, -100, 0);
+		assertEquals(1,testArrayList.size());
+		assertFalse(testArrayList.contains(testPoint_NE1));
+		assertFalse(testArrayList.contains(testPoint_NW1));
+		assertTrue(testArrayList.contains(testPoint_SW1));
+		assertFalse(testArrayList.contains(testPoint_SE1));
+		
+		//SE
+		testArrayList = testTree.find(0, 100, -100, 0);
+		assertEquals(1,testArrayList.size());
+		assertFalse(testArrayList.contains(testPoint_NE1));
+		assertFalse(testArrayList.contains(testPoint_NW1));
+		assertFalse(testArrayList.contains(testPoint_SW1));
+		assertTrue(testArrayList.contains(testPoint_SE1));
 	}
-
 }

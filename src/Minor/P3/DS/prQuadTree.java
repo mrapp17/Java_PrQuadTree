@@ -38,6 +38,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    long xMin, xMax, yMin, yMax;
    
    private boolean insertSuccessStat;
+   private boolean deleteSuccessStat;
    private ArrayList<T> foundList;
     
    // Initialize quadtree to empty state.
@@ -47,6 +48,9 @@ public class prQuadTree< T extends Compare2D<? super T> > {
       this.yMin = yMin;
       this.yMax = yMax;
       root = null;
+      insertSuccessStat = false;
+      deleteSuccessStat = false;
+      foundList = new ArrayList<T>();
    }
     
    // Pre:   elem != null
@@ -75,10 +79,9 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    //       in the tree, then that element has been removed.
    // Returns true iff a matching element has been removed from the tree.   
    public boolean delete(T elem) {
-		if(elem == null)
-			return false;
-		else
-			return true;
+	   deleteSuccessStat = false;
+	   root = deleteHelper(root,elem, xMin, xMax, yMin, yMax);
+	   return deleteSuccessStat;
 	}
 
    // Pre:  xLo < xHi and yLo < yHi
@@ -86,13 +89,14 @@ public class prQuadTree< T extends Compare2D<? super T> > {
    //in the tree and x lies at coordinates within the defined rectangular 
    // region, including the boundary of the region.
    public ArrayList<T> find(long xLo, long xHi, long yLo, long yHi) {
-		foundList.clear();
-		return null;
+   		foundList.clear();
+   		findListHelper(root, xLo, xHi, yLo, yHi);
+		return foundList;
 	}
 	
 	// Additonal methods should be added below:
    @SuppressWarnings({ "rawtypes", "unchecked" })
-   private prQuadNode insertHelper(prQuadNode currNode, prQuadLeaf newNode,long xLo, long xHi, long yLo, long yHi){
+   	private prQuadNode insertHelper(prQuadNode currNode, prQuadLeaf newNode,long xLo, long xHi, long yLo, long yHi){
 	   //If the current node is null then create new leaf node and return that
 	   if(currNode == null) {
 		   insertSuccessStat = true;
@@ -143,7 +147,6 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 	   }
    }
 
-
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private T findHelper(prQuadNode currNode, T elem, long xLo, long xHi, long yLo, long yHi){
 		if(currNode == null)
@@ -179,47 +182,96 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 		}
 		return null;
 	}	
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private prQuadNode deleteHelper(prQuadNode currNode, T elem, long xLo, long xHi, long yLo, long yHi) {
+		//Check if node is empty, or if elem is null
+		if(currNode == null || elem == null)
+			return null;
+		else if(currNode.getClass() == prQuadTree.prQuadLeaf.class){
+			prQuadTree.prQuadLeaf currNodeLeaf = (prQuadTree.prQuadLeaf) currNode;
+			if(currNodeLeaf.Elements.get(0).equals(elem)){
+				deleteSuccessStat = true;
+				return null;
+			}
+			else
+				return currNode;
+		}
+		else if(currNode.getClass() == prQuadTree.prQuadInternal.class){
+			int nonNullCount = 0;
+			long xMid = (long) (xHi + xLo) /2;
+		    long yMid = (long) (yHi + yLo) /2;
+			prQuadTree.prQuadInternal currNodeInt = (prQuadTree.prQuadInternal) currNode;
+			//Deterine direction and remove node
+			Direction deleteQuad = elem.inQuadrant(xLo, xHi, yLo, yHi);
+			if(deleteQuad == Direction.NE){
+				currNodeInt.NE = deleteHelper(currNodeInt.NE, elem, xMid, xHi, yMid, yHi);
+			}
+			else if(deleteQuad == Direction.NW){
+				currNodeInt.NW = deleteHelper(currNodeInt.NW, elem, xLo, xMid, yMid, yHi);
+			}
+			else if(deleteQuad == Direction.SW){
+				currNodeInt.SW = deleteHelper(currNodeInt.SW, elem, xLo, xMid, yLo, yMid);
+			}
+			else if(deleteQuad == Direction.SE){
+				currNodeInt.SE = deleteHelper(currNodeInt.SE, elem, xMid, xHi, yLo, yMid);
+			}
+			//Determine how many null children this node possesses
+			if(currNodeInt.NE != null)
+				++nonNullCount;
+			if(currNodeInt.NW != null)
+				++nonNullCount;
+			if(currNodeInt.SW != null)
+				++nonNullCount;
+			if(currNodeInt.SE != null)
+				++nonNullCount;
+			//If there is greater than 1 non null node return return currNodeInt
+			if(nonNullCount > 1){
+				return currNodeInt;
+			}
+			//If there is one non null child return that child
+			else if(nonNullCount == 1){
+				if(currNodeInt.NE != null)
+					return currNodeInt.NE;
+				if(currNodeInt.NW != null)
+					return currNodeInt.NW;
+				if(currNodeInt.SW != null)
+					return currNodeInt.SW;
+				if(currNodeInt.SE != null)
+					return currNodeInt.SE;
+			}
+			//If there are no nonNull children return null
+			else {
+				return null;
+			}
+		}
+		//ERROR
+		return null;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private void findListHelper(prQuadNode currNode, long xLo, long xHi, long yLo, long yHi) {
+		if(currNode == null)
+			return;
+		else if(currNode.getClass() == prQuadTree.prQuadLeaf.class){
+			prQuadLeaf currNodeLeaf = (prQuadTree.prQuadLeaf) currNode;
+			if(currNodeLeaf.Elements.get(0).inBox(xLo, xHi, yLo, yHi))
+				foundList.add(currNodeLeaf.Elements.get(0));
+			return;
+		}
+		else if(currNode.getClass() == prQuadTree.prQuadInternal.class){
+			prQuadInternal currNodeInt = (prQuadTree.prQuadInternal) currNode;
+			if(currNodeInt.NE != null)
+				findListHelper(currNodeInt.NE,xLo,xHi,yLo,yHi);
+			if(currNodeInt.NW != null)
+				findListHelper(currNodeInt.NW,xLo,xHi,yLo,yHi);
+			if(currNodeInt.SW != null)
+				findListHelper(currNodeInt.SW,xLo,xHi,yLo,yHi);
+			if(currNodeInt.SE != null)
+				findListHelper(currNodeInt.SE,xLo,xHi,yLo,yHi);
+			return;
+		}
+		
+	}
 }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
