@@ -10,12 +10,12 @@ public class prQuadTreeTest {
 
 	@Test
 	public void testPrQuadTreeConstructor() {
-		prQuadTree<Point> testTree = new prQuadTree<Point>(-100,100,-90,90);
+		prQuadTree<Point> testTree = new prQuadTree<Point>(0,32678,0,32678);
 		assertNull(testTree.root);
-		assertEquals(testTree.xMin,-100);
-		assertEquals(testTree.xMax,100);
-		assertEquals(testTree.yMin,-90);
-		assertEquals(testTree.yMax,90);
+		assertEquals(testTree.xMin,0);
+		assertEquals(testTree.xMax,32678);
+		assertEquals(testTree.yMin,0);
+		assertEquals(testTree.yMax,32678);
 	}
 
 	@SuppressWarnings("rawtypes")

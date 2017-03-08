@@ -155,12 +155,12 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 			   return temp;
 		   }
 		   else{
-			   System.err.println("ERROR[INSERTHELPER]: DIRECTION UNKNOWN");
+			   //Everything is broken throw an error or something and ret null
 			   return null;
 		   }
 	   }
 	   else{
-		   System.err.println("ERROR[INSERTHELPER]: UNKNOWN NODE TYPE");
+		   //ERROR
 		   return null;
 	   }
    }
@@ -194,7 +194,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 				return findHelper(temp.SE, elem, xMid, xHi, yLo, yMid);
 			}
 			else{
-				System.err.println("ERROR[FINDHELPER]: DIRECTION UNKNOWN");
+				//ERROR
 				return null;
 			}
 		}
@@ -264,7 +264,7 @@ public class prQuadTree< T extends Compare2D<? super T> > {
 				return null;
 			}
 		}
-		System.err.println("ERROR[DELETEHELPER]: UNKNOWN NODE TYPE");
+		//ERROR
 		return null;
 	}
 

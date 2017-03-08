@@ -1,0 +1,4 @@
+TestTreeInitialization.txt Score: 50.00 / 50.00
+TestInsertion.txt Score: 868.00 / 868.00
+TestRegionSearch.txt Score: 192.00 / 192.00
+TestDeletion.txt Score: 1167.00 / 1167.00

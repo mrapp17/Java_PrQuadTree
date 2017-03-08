@@ -1,0 +1,5 @@
+ Completed test of quadtree initialization.
+ Completed test of quadtree insertion.
+ Completed test of quadtree region search.
+ Completed test of quadtree deletion.
+ Completed 4 tests.
